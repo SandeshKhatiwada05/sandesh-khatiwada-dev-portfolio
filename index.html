@@ -104,7 +104,7 @@
            ============================ */
         body {
             display: grid;
-            grid-template-columns: 260px 1fr;
+            grid-template-columns: auto 1fr;
             grid-template-rows: auto 1fr;
             min-height: 100vh;
         }
@@ -122,17 +122,152 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
             transition: var(--transition);
             z-index: 100;
+            width: 260px;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .sidebar-name {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .brand-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: #fff;
+            stroke-width: 2.5;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed .sidebar-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            right: 0.5rem;
         }
 
         .sidebar-brand {
             text-align: center;
-            padding: 0 1.5rem;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-social {
+            margin-top: auto;
+            padding: 1.5rem 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .sidebar.collapsed .social-link {
+            width: 44px;
+            margin: 0.25rem auto;
+        }
+
+        .social-link:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .social-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .social-link:hover::after {
+            opacity: 1;
+        }
+
+        .sidebar:not(.collapsed) .sidebar-social {
+            flex-direction: row;
+        }
+
+        .sidebar.collapsed .sidebar-social {
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .brand-icon {
@@ -140,6 +275,7 @@
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
+            object-position: center;
             border: 3px solid var(--accent);
             transition: var(--transition);
         }
@@ -147,6 +283,14 @@
         .brand-icon:hover {
             transform: scale(1.05);
             border-color: var(--accent-hover);
+        }
+
+        .sidebar-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            white-space: nowrap;
         }
 
         .nav-list {
@@ -164,6 +308,13 @@
             margin-bottom: 0.5rem;
             transition: var(--transition);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            padding: 1rem;
+            justify-content: center;
         }
 
         .nav-item:hover {
@@ -172,9 +323,18 @@
             transform: translateX(4px);
         }
 
+        .sidebar.collapsed .nav-item:hover {
+            transform: scale(1.1);
+        }
+
         .nav-item.active {
             background: var(--accent);
             color: #fff;
+        }
+
+        .nav-item span {
+            transition: var(--transition);
+            white-space: nowrap;
         }
 
         .nav-icon {
@@ -182,6 +342,36 @@
             height: 24px;
             min-width: 24px;
             stroke-width: 2;
+        }
+
+        /* Tooltip for collapsed sidebar */
+        .sidebar.collapsed .nav-item {
+            position: relative;
+        }
+
+        .sidebar.collapsed .nav-item::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed .nav-item:hover::after {
+            opacity: 1;
         }
 
         /* ============================
@@ -288,6 +478,94 @@
         }
 
         /* ============================
+           GAMES TEASER
+           ============================ */
+        .games-teaser {
+            position: relative;
+            margin: 3rem 0;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)),
+                        url('https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80');
+            background-blend-mode: overlay;
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .games-teaser::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(113, 90, 90, 0.9), rgba(138, 112, 112, 0.8));
+            z-index: 1;
+        }
+
+        .games-teaser:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .games-teaser-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .games-teaser-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
+        }
+
+        .games-teaser-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .games-teaser-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ============================
            TIMELINE (Learning Journey)
            ============================ */
         .timeline-container {
@@ -297,20 +575,21 @@
 
         .timeline-line {
             position: absolute;
-            left: 40px;
+            left: 25px;
             top: 0;
             bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, var(--accent), var(--accent-hover));
+            width: 2px;
+            background: var(--border);
             border-radius: 3px;
         }
 
         .timeline-item {
             position: relative;
-            padding-left: 100px;
+            padding-left: 60px;
             margin-bottom: 3rem;
             opacity: 0;
             animation: fadeInUp 0.6s ease forwards;
+            cursor: pointer;
         }
 
         .timeline-item:nth-child(1) { animation-delay: 0.1s; }
@@ -332,37 +611,76 @@
 
         .timeline-marker {
             position: absolute;
-            left: 27px;
-            top: 8px;
-            width: 28px;
-            height: 28px;
+            left: 17px;
+            top: 15px;
+            width: 16px;
+            height: 16px;
             background: var(--accent);
-            border: 4px solid var(--bg-primary);
+            border: 3px solid var(--bg-primary);
             border-radius: 50%;
             z-index: 2;
+            transition: var(--transition);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-item:hover .timeline-marker {
+            transform: scale(1.5);
+            background: var(--accent-hover);
+            box-shadow: 0 0 20px var(--accent);
         }
 
         .timeline-year {
             position: absolute;
+            top: 0;
             left: 0;
-            top: 5px;
-            font-size: 0.875rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 800;
             color: var(--accent);
-            font-family: 'Fira Code', monospace;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px 0 8px 0;
+            transition: var(--transition);
+            z-index: 3;
+            line-height: 1;
+        }
+
+        .timeline-item:hover .timeline-year {
+            transform: scale(1.05);
+            color: var(--accent-hover);
+        }
+
+        .timeline-item.active .timeline-year {
+            transform: scale(1.1);
+            color: var(--accent-hover);
         }
 
         .timeline-content {
             background: var(--bg-card);
             padding: 1.5rem;
+            padding-top: 3rem;
             border-radius: 12px;
             border: 1px solid var(--border);
             transition: var(--transition);
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .timeline-item.expanded .timeline-content {
+            max-height: 500px;
         }
 
         .timeline-content:hover {
             transform: translateX(8px);
             box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .timeline-item.active .timeline-content {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-lg);
+            background: var(--bg-tertiary);
         }
 
         .timeline-title {
@@ -470,6 +788,27 @@
             box-shadow: var(--shadow-md);
         }
 
+        .project-item.more-projects {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border-color: var(--accent);
+        }
+
+        .project-item.more-projects .project-title,
+        .project-item.more-projects .project-desc {
+            color: #fff;
+        }
+
+        .project-item.more-projects .tag {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .project-item.more-projects .project-link {
+            color: #fff;
+            font-weight: 700;
+        }
+
         .project-header {
             display: flex;
             justify-content: space-between;
@@ -519,6 +858,148 @@
         }
 
         /* ============================
+           TIC-TAC-TOE GAME
+           ============================ */
+        .tictactoe-container {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 200px;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+
+        .tictactoe-container:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .ttt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .ttt-title {
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ttt-turn {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+        }
+
+        .ttt-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 0.75rem;
+        }
+
+        .ttt-cell {
+            aspect-ratio: 1;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .ttt-cell:hover:not(.filled) {
+            background: var(--bg-tertiary);
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .ttt-cell.filled {
+            cursor: not-allowed;
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .ttt-cell.winner {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            animation: winPulse 0.6s ease infinite;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes winPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .ttt-reset {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ttt-reset:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 1200px) {
+            .tictactoe-container {
+                position: static;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto 2rem;
+                transform: rotate(0deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tictactoe-container {
+                max-width: 250px;
+            }
+        }
+
+        /* ============================
            GAMES
            ============================ */
         .games-container {
@@ -548,6 +1029,20 @@
             align-items: center;
             justify-content: center;
             font-size: 4rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .game-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: var(--transition);
+        }
+
+        .game-card:hover .game-card-image img {
+            transform: scale(1.05);
         }
 
         .game-card-content {
@@ -722,77 +1217,109 @@
             font-size: 0.875rem;
         }
 
-        /* FULLSCREEN CV MODAL */
-        .fullscreen-modal {
+
+
+        /* ============================
+           CV MODAL
+           ============================ */
+        .cv-modal {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: var(--bg-primary);
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
             display: none;
-            flex-direction: column;
-            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
 
-        .fullscreen-modal.active {
+        .cv-modal.active {
             display: flex;
         }
 
-        .fullscreen-close {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .cv-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+        }
+
+        .cv-modal-container {
+            position: relative;
+            width: 95%;
+            height: 95%;
+            max-width: 1400px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .cv-close-btn {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             z-index: 10;
         }
 
-        .fullscreen-close:hover {
+        .cv-close-btn:hover {
             background: var(--accent);
-            color: #fff;
+            border-color: var(--accent);
             transform: rotate(90deg) scale(1.1);
         }
 
-        .fullscreen-close svg {
+        .cv-close-btn svg {
             width: 24px;
             height: 24px;
-        }
-
-        .fullscreen-header {
-            padding: 2rem;
-            background: var(--bg-secondary);
-            border-bottom: 2px solid var(--border);
-            text-align: center;
-        }
-
-        .fullscreen-title {
-            font-size: 2rem;
-            color: var(--text-primary);
-        }
-
-        .fullscreen-body {
-            flex: 1;
-            overflow: auto;
-            padding: 2rem;
         }
 
         .cv-iframe {
             width: 100%;
             height: 100%;
-            min-height: calc(100vh - 200px);
             border: none;
-            border-radius: 8px;
-            box-shadow: var(--shadow-lg);
+            background: #1a1a1a;
+        }
+
+        @media (max-width: 768px) {
+            .cv-modal-container {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
         }
 
         /* ============================
@@ -869,15 +1396,28 @@
             h2 { font-size: 1.5rem; }
 
             .timeline-item {
-                padding-left: 80px;
+                padding-left: 50px;
             }
 
             .timeline-line {
-                left: 30px;
+                left: 20px;
             }
 
             .timeline-marker {
-                left: 17px;
+                left: 13px;
+            }
+
+            .timeline-year {
+                font-size: 1.2rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            .games-teaser-title {
+                font-size: 2rem;
+            }
+
+            .games-teaser-subtitle {
+                font-size: 1rem;
             }
 
             .grid-2,
@@ -925,33 +1465,39 @@
 <body class="dark-theme">
     <!-- SIDEBAR NAVIGATION -->
     <aside class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
         <div class="sidebar-brand">
-            <img src="sources/icon.jpeg" alt="Brand" class="brand-icon">
+            <img src="sources/My Image.jpg" alt="Sandesh Khatiwada" class="brand-icon">
+            <div class="sidebar-name">Sandesh Khatiwada</div>
         </div>
         <nav>
             <ul class="nav-list">
-                <li><a href="#" class="nav-item active" data-page="home">
+                <li><a href="#" class="nav-item active" data-page="home" data-tooltip="Home">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
                     </svg>
                     <span>Home</span>
                 </a></li>
-                <li><a href="#" class="nav-item" data-page="skills">
+                <li><a href="#" class="nav-item" data-page="skills" data-tooltip="Skills">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                     </svg>
                     <span>Skills</span>
                 </a></li>
-                <li><a href="#" class="nav-item" data-page="projects">
+                <li><a href="#" class="nav-item" data-page="projects" data-tooltip="Projects">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
                         <polyline points="13 2 13 9 20 9"></polyline>
                     </svg>
                     <span>Projects</span>
                 </a></li>
-                <li><a href="#" class="nav-item" data-page="games">
+                <li><a href="#" class="nav-item" data-page="games" data-tooltip="Games">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
                         <polyline points="17 2 12 7 7 2"></polyline>
@@ -960,6 +1506,23 @@
                 </a></li>
             </ul>
         </nav>
+        <div class="sidebar-social">
+            <a href="https://www.linkedin.com/in/sandesh-khatiwada-523b4626a/" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="LinkedIn" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/SandeshKhatiwada05" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="GitHub" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com/itsme__sandesh/" target="_blank" rel="noopener noreferrer" class="social-link" data-tooltip="Instagram" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+            </a>
+        </div>
     </aside>
 
     <!-- TOP BAR -->
@@ -978,8 +1541,8 @@
                 </svg>
             </button>
 
-            <!-- CV Button - Document icon -->
-            <button class="icon-btn" id="cv-btn" title="View CV" aria-label="Open CV modal">
+            <!-- CV Button -->
+            <button class="icon-btn" id="cv-btn" title="View CV" aria-label="Open CV">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -1003,19 +1566,17 @@
         <!-- Content will be inserted here by JavaScript -->
     </main>
 
-    <!-- CV MODAL - Full Viewport -->
-    <div class="modal fullscreen-modal" id="cv-modal">
-        <button class="fullscreen-close" id="cv-close" aria-label="Close CV">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </button>
-        <div class="fullscreen-header">
-            <h2 class="fullscreen-title">Curriculum Vitae</h2>
-        </div>
-        <div class="fullscreen-body">
-            <iframe src="sources/Sandesh_CV.pdf" class="cv-iframe" title="CV Document"></iframe>
+    <!-- CV MODAL -->
+    <div class="cv-modal" id="cv-modal">
+        <div class="cv-modal-overlay"></div>
+        <div class="cv-modal-container">
+            <button class="cv-close-btn" id="cv-close-btn" aria-label="Close CV">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <iframe src="" id="cv-iframe" class="cv-iframe"></iframe>
         </div>
     </div>
 
@@ -1077,49 +1638,49 @@
                     title: 'Royal Battletown: GTA Game',
                     description: 'Open-world action chaos, GTA style',
                     embedUrl: 'https://www.madkidgames.com/full/royal-battletown-gta-game',
-                    icon: '🚗'
+                    image: 'https://www.madkidgames.com/games/royal-battletown-gta-game/thumb_2.jpg'
                 },
                 {
                     id: 'granny',
                     title: 'Granny',
                     description: 'Survival horror puzzle adventure',
                     embedUrl: 'https://www.madkidgames.com/full/granny',
-                    icon: '👵'
+                    image: 'https://play-lh.googleusercontent.com/WsUsst7uXYvpXzaL1XF7wRDpE1ZvF0XqRRgj0Dvti5VPRnHfFhQLuVKl2p2Zun-oyQ=w526-h296-rw'
                 },
                 {
                     id: 'motorcycle-simulator',
                     title: 'Ultimate Motorcycle Simulator',
                     description: 'Realistic bike riding experience',
                     embedUrl: 'https://www.madkidgames.com/full/ultimate-motorcycle-simulator',
-                    icon: '🏍️'
+                    image: 'https://i.ytimg.com/vi/ASxRCrGDtH4/hq720.jpg'
                 },
                 {
                     id: 'bike-race',
                     title: 'Bike Race: Racing Game',
                     description: 'Fast-paced competitive racing',
                     embedUrl: 'https://www.madkidgames.com/full/bike-race-racing-game',
-                    icon: '🚴'
+                    image: 'https://play-lh.googleusercontent.com/8Ja0GjI9j7FOlkrbyMzeol15yMPTfJ-vjnx4Ko2lilRA08qvza14UTfDceJInp7nIA=w526-h296-rw'
                 },
                 {
                     id: 'ninja-samurai',
                     title: 'Ninja Samurai: Action RPG Survival',
                     description: 'Combat-driven action adventure',
                     embedUrl: 'https://www.madkidgames.com/full/ninja-samurai-action-rpg-survival',
-                    icon: '🗡️'
+                    image: 'https://play-lh.googleusercontent.com/2Mq1BNAcgJhbIB2GeZ9WBeqQ1MH-CvrOouGXDCcS4pnH1deVdfqmqXHVdt6XrJ51tQ=w526-h296-rw'
                 },
                 {
                     id: 'temple-rider',
                     title: 'Temple Rider: BMX Racing 3D',
                     description: 'Extreme BMX stunts and racing',
                     embedUrl: 'https://www.madkidgames.com/full/temple-rider-bmx-racing-3d',
-                    icon: '🚲'
+                    image: 'https://www.madkidgames.com/games/temple-rider-bmx-racing-3d/thumb_2.jpg'
                 },
                 {
                     id: 'tower-crush',
                     title: 'Tower Crush – Defense TD',
                     description: 'Strategic tower defense gameplay',
                     embedUrl: 'https://www.madkidgames.com/full/tower-crush-defense-td',
-                    icon: '🏰'
+                    image: 'https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=314,height=314,fit=cover,f=auto/9f86e9ed37b14b4227b9a18c6d087c91/tower-crush.png'
                 }
             ],
             
@@ -1134,57 +1695,65 @@
             
             projects: [
                 {
-                    title: 'Spring Boot Microservices',
-                    description: 'Scalable backend system using Spring Boot with JPA, Security, and PostgreSQL for enterprise applications.',
-                    tags: ['Spring Boot', 'Java', 'PostgreSQL', 'Microservices'],
-                    github: 'https://github.com/SandeshKhatiwada05'
+                    title: 'Dev Notes',
+                    description: 'Comprehensive development notes and documentation covering various programming concepts, best practices, and technical references.',
+                    tags: ['Documentation', 'Learning', 'Reference'],
+                    github: 'https://github.com/SandeshKhatiwada05/sandesh-khatiwada-dev-notes'
                 },
                 {
-                    title: 'ML Data Pipeline',
-                    description: 'Automated ETL pipeline using Python, Jupyter Notebook, and Apache Hadoop for big data processing.',
-                    tags: ['Python', 'ML', 'Hadoop', 'Data Engineering'],
-                    github: 'https://github.com/SandeshKhatiwada05'
+                    title: 'Spring Boot Hospital Management System',
+                    description: 'Full-featured hospital management system built with Spring Boot and Spring Data JPA, handling patient records, appointments, and staff management.',
+                    tags: ['Spring Boot', 'Java', 'JPA', 'PostgreSQL'],
+                    github: 'https://github.com/SandeshKhatiwada05/Hospital-Management-System-using-Spring-Boot-and-Spring-Data-JPA'
                 },
                 {
-                    title: 'Full-Stack Web Application',
-                    description: 'Modern responsive web app with React frontend and .NET backend, featuring dark/light theme support.',
-                    tags: ['React', '.NET', 'JavaScript', 'Full-Stack'],
-                    github: 'https://github.com/SandeshKhatiwada05'
+                    title: 'n8n College Info Chatbot',
+                    description: 'Intelligent chatbot powered by n8n with web scraping capabilities to provide automated college information and assistance.',
+                    tags: ['n8n', 'Automation', 'Web Scraping', 'Chatbot'],
+                    github: 'https://github.com/SandeshKhatiwada05/N8N-Powered-College-Info-Chatbot-with-WebScaping'
                 },
                 {
-                    title: 'Cloud Infrastructure Setup',
-                    description: 'Azure VMs, App Services, and networking setup with infrastructure as code principles and automation.',
-                    tags: ['Azure', 'Cloud', 'DevOps', 'Infrastructure'],
-                    github: 'https://github.com/SandeshKhatiwada05'
+                    title: 'Advanced Database Work',
+                    description: 'Comprehensive database projects using OracleDB, MongoDB, CockroachDB, Hadoop, and Docker for distributed data management.',
+                    tags: ['Database', 'Hadoop', 'Docker', 'Big Data'],
+                    github: 'https://github.com/SandeshKhatiwada05/Advanced-Database-with-OracleDB-MongoDB-cockroachDB-Hadoop-Docker'
+                },
+                {
+                    title: 'More Projects',
+                    description: 'Explore all my repositories including web development, automation, and machine learning projects.',
+                    tags: ['Portfolio', 'GitHub'],
+                    github: 'https://github.com/SandeshKhatiwada05?tab=repositories',
+                    isMore: true
                 }
             ],
             
             timeline: [
                 {
-                    year: '2022',
-                    title: 'Started University Journey',
-                    description: 'Began Bachelor of Information Technology at Federation University, diving deep into programming fundamentals and software development.'
+                    year: '2026',
+                    title: 'Graduation & Professional Growth',
+                    description: 'Graduating with comprehensive experience in backend development, ML automation, cloud services, and modern full-stack applications. Ready to make an impact.'
                 },
-                {
+                                {
+                    year: '2025',
+                    title: 'Full-Stack & Advanced Systems',
+                    description: 'Expanded to full-stack development with React, .NET, and advanced cloud infrastructure. Built production-ready applications with CI/CD pipelines.'
+                },
+                                {
+                    year: '2024',
+                    title: 'ML & Cloud Technologies',
+                    description: 'Explored machine learning with Python, Jupyter Notebook, and Apache Hadoop. Started working with Microsoft Azure cloud services and automation tools like n8n.'
+                },
+                                {
                     year: '2023',
                     title: 'Java & Backend Development',
                     description: 'Mastered Java programming, Spring Boot framework, and began building scalable backend systems with PostgreSQL and microservices architecture.'
                 },
                 {
-                    year: '2024',
-                    title: 'ML & Cloud Technologies',
-                    description: 'Explored machine learning with Python, Jupyter Notebook, and Apache Hadoop. Started working with Microsoft Azure cloud services and automation tools like n8n.'
-                },
-                {
-                    year: '2025',
-                    title: 'Full-Stack & Advanced Systems',
-                    description: 'Expanded to full-stack development with React, .NET, and advanced cloud infrastructure. Built production-ready applications with CI/CD pipelines.'
-                },
-                {
-                    year: '2026',
-                    title: 'Graduation & Professional Growth',
-                    description: 'Graduating with comprehensive experience in backend development, ML automation, cloud services, and modern full-stack applications. Ready to make an impact.'
+                    year: '2022',
+                    title: 'Started University Journey',
+                    description: 'Began Bachelor of Science in Computer Science and Information Technology at Orchid University, diving deep into programming fundamentals and software development.'
                 }
+                
             ]
         };
 
@@ -1204,13 +1773,28 @@
                         Familiar with multiple languages (Java, Python, C#, JavaScript), cloud platforms (Azure), and containerization (Docker).
                     </p>
 
+                    <!-- Tic-Tac-Toe Mini Game -->
+                    <div id="tictactoe-game" class="tictactoe-container"></div>
+
+                    <!-- Animated Games Teaser -->
+                    <div class="games-teaser" onclick="navigate('games')">
+                        <div class="games-teaser-content">
+                            <svg class="games-teaser-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                                <polyline points="17 2 12 7 7 2"></polyline>
+                            </svg>
+                            <h2 class="games-teaser-title">Bored? Play Games! 🎮</h2>
+                            <p class="games-teaser-subtitle">Click here to explore interactive HTML5 games</p>
+                        </div>
+                    </div>
+
                     <h2 class="section-title" style="margin-top: 3rem;">My Learning Journey</h2>
                     <p class="section-subtitle">From university beginnings to professional development (2022-2026)</p>
                     
                     <div class="timeline-container">
                         <div class="timeline-line"></div>
-                        ${CONFIG.timeline.map(item => `
-                            <div class="timeline-item">
+                        ${CONFIG.timeline.map((item, index) => `
+                            <div class="timeline-item" data-year="${item.year}" onclick="toggleTimeline(this)">
                                 <div class="timeline-marker"></div>
                                 <div class="timeline-year">${item.year}</div>
                                 <div class="timeline-content">
@@ -1225,6 +1809,18 @@
                     <p>© 2026 Sandesh Khatiwada | <a href="https://github.com/SandeshKhatiwada05">GitHub</a></p>
                 </footer>
             `;
+        }
+
+        // Timeline interactivity
+        function toggleTimeline(element) {
+            // Remove active from all timeline items
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                if (item !== element) {
+                    item.classList.remove('active');
+                }
+            });
+            // Toggle active on clicked item
+            element.classList.toggle('active');
         }
 
         function renderSkills() {
@@ -1257,10 +1853,10 @@
                     <p class="section-subtitle">Recent work and notable projects</p>
                     
                     ${CONFIG.projects.map(project => `
-                        <div class="project-item">
+                        <div class="project-item${project.isMore ? ' more-projects' : ''}">
                             <div class="project-header">
                                 <h3 class="project-title">${project.title}</h3>
-                                <a href="${project.github}" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+                                <a href="${project.github}" target="_blank" rel="noopener noreferrer" class="project-link">${project.isMore ? 'View All →' : 'View Repo →'}</a>
                             </div>
                             <p class="project-desc">${project.description}</p>
                             <div class="tag-list">
@@ -1285,7 +1881,9 @@
                         <div class="grid grid-4">
                             ${CONFIG.games.map(game => `
                                 <div class="game-card" onclick="openGame('${game.id}')">
-                                    <div class="game-card-image">${game.icon}</div>
+                                    <div class="game-card-image">
+                                        <img src="${game.image}" alt="${game.title}" loading="lazy">
+                                    </div>
                                     <div class="game-card-content">
                                         <h3 class="game-card-title">${game.title}</h3>
                                         <p class="game-card-desc">${game.description}</p>
@@ -1307,11 +1905,18 @@
            ============================ */
         const mainContent = document.getElementById('main-content');
         const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
         const hamburger = document.getElementById('hamburger');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         let currentPage = 'home';
+
+        // Sidebar collapse/expand toggle
+        sidebarToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('collapsed');
+        });
 
         // Navigation
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -1358,17 +1963,6 @@
             sidebar.classList.remove('active');
             sidebarOverlay.classList.remove('active');
             hamburger.classList.remove('active');
-        });
-
-        // CV Modal
-        document.getElementById('cv-btn').addEventListener('click', () => {
-            document.getElementById('cv-modal').classList.add('active');
-            body.style.overflow = 'hidden';
-        });
-
-        document.getElementById('cv-close').addEventListener('click', () => {
-            document.getElementById('cv-modal').classList.remove('active');
-            body.style.overflow = '';
         });
 
         // Game Modal
@@ -1432,11 +2026,11 @@
             const themeIcon = themeToggle.querySelector('.theme-icon');
             
             if (isDark) {
-                // Transparent moon for dark mode
-                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+                // Up moon for dark mode (crescent facing up)
+                themeIcon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>';
             } else {
-                // Moon facing down for light mode
-                themeIcon.innerHTML = '<path d="M3 11.21A9 9 0 1 0 12.79 21 7 7 0 0 1 3 11.21z"></path>';
+                // Down moon for light mode (crescent facing down)
+                themeIcon.innerHTML = '<path d="M12 21a6 6 0 0 1-9-9 9 9 0 1 0 9 9z"/>';
             }
         }
 
@@ -1451,10 +2045,40 @@
         
         updateThemeIcon();
 
+        // CV Modal
+        const cvBtn = document.getElementById('cv-btn');
+        const cvModal = document.getElementById('cv-modal');
+        const cvCloseBtn = document.getElementById('cv-close-btn');
+        const cvIframe = document.getElementById('cv-iframe');
+        const cvOverlay = document.querySelector('.cv-modal-overlay');
+
+        cvBtn.addEventListener('click', () => {
+            cvModal.classList.add('active');
+            cvIframe.src = 'sources/Sandesh_CV.pdf';
+            body.style.overflow = 'hidden';
+        });
+
+        cvCloseBtn.addEventListener('click', () => {
+            cvModal.classList.remove('active');
+            setTimeout(() => {
+                cvIframe.src = '';
+            }, 300);
+            body.style.overflow = '';
+        });
+
+        cvOverlay.addEventListener('click', () => {
+            cvModal.classList.remove('active');
+            setTimeout(() => {
+                cvIframe.src = '';
+            }, 300);
+            body.style.overflow = '';
+        });
+
         // Close modals on Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                document.getElementById('cv-modal').classList.remove('active');
+                cvModal.classList.remove('active');
+                cvIframe.src = '';
                 document.getElementById('game-modal').classList.remove('active');
                 document.getElementById('game-iframe').src = '';
                 body.style.overflow = '';
@@ -1464,5 +2088,8 @@
         // Initialize
         navigate('home');
     </script>
+    
+    <!-- Tic-Tac-Toe Game -->
+    <script src="js/tictactoe.js"></script>
 </body>
 </html>

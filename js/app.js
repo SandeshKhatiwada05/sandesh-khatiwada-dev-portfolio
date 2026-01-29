@@ -8,7 +8,6 @@ class App {
         this.gameModal = document.getElementById('game-modal');
         this.cvModal = document.getElementById('cv-modal');
         this.gameIframe = document.getElementById('game-iframe');
-        this.cvIframe = document.getElementById('cv-iframe');
         this.gameModalTitle = document.getElementById('game-modal-title');
         this.cvBtn = document.getElementById('cv-btn');
         
@@ -21,17 +20,26 @@ class App {
 
         // Modal close buttons
         document.getElementById('game-modal-close').addEventListener('click', () => this.closeGameModal());
-        document.getElementById('cv-modal-close').addEventListener('click', () => this.closeCVModal());
+        const cvCloseBtn = document.getElementById('cv-close');
+        if (cvCloseBtn) {
+            cvCloseBtn.addEventListener('click', () => this.closeCVModal());
+        }
 
-        // Overlay clicks
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
+        // CV Overlay click to close
+        const cvOverlay = document.querySelector('.fullscreen-overlay');
+        if (cvOverlay) {
+            cvOverlay.addEventListener('click', () => this.closeCVModal());
+        }
+
+        // Game overlay click
+        const gameOverlay = document.querySelector('.modal-overlay');
+        if (gameOverlay) {
+            gameOverlay.addEventListener('click', (e) => {
+                if (e.target === gameOverlay) {
                     this.closeGameModal();
-                    this.closeCVModal();
                 }
             });
-        });
+        }
 
         // Game controls
         document.getElementById('fullscreen-btn').addEventListener('click', () => this.toggleFullscreen());
@@ -40,8 +48,18 @@ class App {
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                this.closeGameModal();
-                this.closeCVModal();
+                if (this.cvModal.classList.contains('active')) {
+                    this.closeCVModal();
+                } else if (this.gameModal.classList.contains('active')) {
+                    this.closeGameModal();
+                }
+            }
+            // F key for CV fullscreen
+            if (e.key === 'f' || e.key === 'F') {
+                if (this.cvModal.classList.contains('active')) {
+                    e.preventDefault();
+                    this.toggleCVFullscreen();
+                }
             }
         });
     }
@@ -118,6 +136,67 @@ class App {
     closeCVModal() {
         this.cvModal.classList.remove('active');
         document.body.style.overflow = '';
+        // Exit fullscreen if active
+        if (document.fullscreenElement === this.cvImage) {
+            document.exitFullscreen().catch(() => {});
+        }
+    }
+
+    /**
+     * Toggle fullscreen mode for CV image
+     */
+    toggleCVFullscreen() {
+        if (!this.cvImage) return;
+
+        if (!document.fullscreenElement) {
+            // Enter fullscreen
+            if (this.cvImage.requestFullscreen) {
+                this.cvImage.requestFullscreen().catch(err => console.error('[CV] Fullscreen error:', err));
+            } else if (this.cvImage.webkitRequestFullscreen) {
+                this.cvImage.webkitRequestFullscreen();
+            } else if (this.cvImage.mozRequestFullScreen) {
+                this.cvImage.mozRequestFullScreen();
+            } else if (this.cvImage.msRequestFullscreen) {
+                this.cvImage.msRequestFullscreen();
+            }
+        } else {
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    }
+
+    /**
+     * Zoom in CV PDF
+     */
+    zoomInCV() {
+        if (!this.cvImage) return;
+        if (this.cvIsZoomed) return; // Already zoomed
+
+        this.cvIsZoomed = true;
+        this.cvImage.classList.add('zoomed');
+        
+        const wrapper = this.cvImage.parentElement;
+        if (wrapper) {
+            wrapper.classList.add('zoomed');
+            wrapper.style.overflow = 'auto';
+        }
+        
+        this.updateCVZoomButtons();
+    }
+
+    /**
+     * Zoom out CV PDF (fit to screen)
+     */
+    zoomOutCV() {
+        if (!this.cvImage) return;
     }
 
     // ===== UTILITIES =====

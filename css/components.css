@@ -18,29 +18,6 @@
     justify-content: center;
 }
 
-.modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    z-index: -1;
-}
-
-.modal-content {
-    background-color: var(--bg-secondary);
-    border-radius: 0.75rem;
-    width: 90%;
-    max-width: 900px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: var(--shadow-lg);
-    animation: slideUp 0.3s ease-out;
-}
 
 @keyframes slideUp {
     from {
@@ -53,49 +30,165 @@
     }
 }
 
-/* Modal Close Button */
-.modal-close {
+
+
+
+/* Fullscreen Overlay */
+.fullscreen-overlay {
     position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
-    width: 2.5rem;
-    height: 2.5rem;
-    background: transparent;
-    border: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
     cursor: pointer;
-    color: var(--text-secondary);
+    z-index: 0;
+}
+
+
+/* Fullscreen Header - REMOVED (not needed for PDF modal) */
+/* Note: Header styling below kept for reference but not used in new CV modal */
+
+/* Fullscreen Body - REMOVED (not needed for PDF modal) */
+
+
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .fullscreen-header {
+        padding: 0.75rem 1rem;
+        min-height: 55px;
+    }
+
+    .fullscreen-title {
+        font-size: 1.1rem;
+    }
+
+
+    .fullscreen-body {
+        min-height: calc(100vh - 55px);
+    }
+
+    .cv-modal-pdf-wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
+    .cv-modal-pdf {
+        width: 100%;
+        height: 100%;
+    }
+
+    .zoom-btn {
+        width: 28px;
+        height: 28px;
+        padding: 3px;
+    }
+
+    .zoom-icon {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Extra small devices (480px and below) */
+@media (max-width: 480px) {
+
+
+
+
+/* CV Modal Header - Fixed at Top */
+.cv-modal-header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    background-color: rgba(0, 10, 10, 0.7);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(211, 218, 217, 0.1);
+    min-height: 70px;
+    animation: slideDown 0.3s ease-out;
+}
+
+
+/* CV Modal Controls Container */
+.cv-modal-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+
+/* Close Button Specific */
+.cv-btn-close {
+    margin-left: 0.5rem;
+}
+
+/* CV Modal Content - Image Container */
+.cv-modal-body {
+    flex: 1;
+    position: relative;
+    z-index: 5;
+    overflow: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
-    z-index: 10;
+    padding: 1rem;
+    animation: fadeIn 0.4s ease-out 0.1s both;
 }
 
-.modal-close:hover {
-    color: var(--accent);
-    background-color: var(--bg-tertiary);
+/* CV Image Styling */
+.cv-image {
+    max-width: 98vw;
+    max-height: calc(98vh - 70px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
     border-radius: 0.5rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    animation: scaleIn 0.4s ease-out;
 }
 
-.modal-close svg {
-    width: 1.5rem;
-    height: 1.5rem;
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
-/* ============================
-   CV MODAL SPECIFIC
-   ============================ */
 
-.modal-cv .modal-content {
-    max-width: 95vw;
-    max-height: 95vh;
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.cv-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 0.5rem;
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .cv-modal-header {
+        padding: 1rem;
+        min-height: 60px;
+    }
+
+    .cv-modal-body {
+        padding: 0.75rem;
+        max-height: calc(100vh - 60px);
+    }
+
+    .cv-image {
+        max-height: calc(100vh - 60px);
+    }
 }
 
 /* ============================
@@ -343,3 +436,5 @@
 .sidebar-overlay.active {
     display: block;
 }
+}
+
