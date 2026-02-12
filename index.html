@@ -38,9 +38,17 @@
             --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --toggle-width: 52px;
+            --toggle-height: 28px;
+            --toggle-padding: 3px;
+            --toggle-thumb-size: 22px;
+            --toggle-track: #2f2e36;
+            --toggle-thumb: #f5f5f5;
+            --toggle-icon: #37353E;
+            --toggle-transition: 0.35s ease;
         }
 
-        body.light-theme {
+        body.light {
             /* LIGHT THEME */
             --bg-primary: #F9F8F6;
             --bg-secondary: #EFE9E3;
@@ -55,6 +63,9 @@
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.15);
+            --toggle-track: #ded5cc;
+            --toggle-thumb: #37353E;
+            --toggle-icon: #F9F8F6;
         }
 
         /* ============================
@@ -77,6 +88,57 @@
             transition: var(--transition);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        /* ============================
+           THEME TOGGLE
+           ============================ */
+        .theme-toggle {
+            width: var(--toggle-width);
+            height: var(--toggle-height);
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-track {
+            width: 100%;
+            height: 100%;
+            background: var(--toggle-track);
+            border-radius: 999px;
+            padding: var(--toggle-padding);
+            display: flex;
+            align-items: center;
+            transition: background var(--toggle-transition);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-thumb {
+            width: var(--toggle-thumb-size);
+            height: var(--toggle-thumb-size);
+            background: var(--toggle-thumb);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--toggle-icon);
+            transition: transform var(--toggle-transition), background var(--toggle-transition), color var(--toggle-transition), box-shadow var(--toggle-transition);
+            box-shadow: var(--shadow-sm);
+            transform: translateX(0);
+        }
+
+        .toggle-thumb svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        body.light .toggle-thumb {
+            transform: translateX(calc(var(--toggle-width) - var(--toggle-thumb-size) - (var(--toggle-padding) * 2)));
         }
 
         /* ============================
@@ -390,6 +452,12 @@
             gap: 1rem;
             z-index: 90;
             height: 70px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .hamburger {
@@ -1462,7 +1530,7 @@
         }
     </style>
 </head>
-<body class="dark-theme">
+<body>
     <!-- SIDEBAR NAVIGATION -->
     <aside class="sidebar" id="sidebar">
         <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
@@ -1534,11 +1602,15 @@
         </button>
         <div class="topbar-spacer"></div>
         <div class="topbar-actions">
-            <!-- Theme Toggle - Transparent moon (dark) / Moon facing down (light) -->
-            <button class="icon-btn theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle dark/light theme">
-                <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="toggle-track">
+                    <span class="toggle-thumb" id="toggleIcon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </span>
+                </span>
             </button>
 
             <!-- CV Button -->
@@ -1908,8 +1980,10 @@
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const hamburger = document.getElementById('hamburger');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
-        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggle = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
         const body = document.body;
+        const themeStorageKey = 'saisa-theme';
         let currentPage = 'home';
 
         // Sidebar collapse/expand toggle
@@ -2013,37 +2087,28 @@
         });
 
         // Theme toggle
+        const moonIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+        const sunIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                body.classList.add('light');
+                toggleIcon.innerHTML = sunIcon;
+            } else {
+                body.classList.remove('light');
+                toggleIcon.innerHTML = moonIcon;
+            }
+            localStorage.setItem(themeStorageKey, theme);
+        }
+
         themeToggle.addEventListener('click', () => {
-            const isDark = body.classList.contains('dark-theme');
-            body.classList.remove('dark-theme', 'light-theme');
-            body.classList.add(isDark ? 'light-theme' : 'dark-theme');
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-            updateThemeIcon();
+            const isLight = body.classList.contains('light');
+            applyTheme(isLight ? 'dark' : 'light');
         });
 
-        function updateThemeIcon() {
-            const isDark = body.classList.contains('dark-theme');
-            const themeIcon = themeToggle.querySelector('.theme-icon');
-            
-            if (isDark) {
-                // Up moon for dark mode (crescent facing up)
-                themeIcon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>';
-            } else {
-                // Down moon for light mode (crescent facing down)
-                themeIcon.innerHTML = '<path d="M12 21a6 6 0 0 1-9-9 9 9 0 1 0 9 9z"/>';
-            }
-        }
-
-        // Load theme preference
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
-            body.classList.remove('dark-theme');
-            body.classList.add('light-theme');
-        }
-        
-        updateThemeIcon();
+        // Load theme preference (default is dark)
+        const savedTheme = localStorage.getItem(themeStorageKey);
+        applyTheme(savedTheme === 'light' ? 'light' : 'dark');
 
         // CV Modal
         const cvBtn = document.getElementById('cv-btn');
