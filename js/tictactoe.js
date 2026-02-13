@@ -7,6 +7,7 @@ class TicTacToe {
         this.gameActive = true;
         this.isComputerThinking = false;
         this.gameContainer = null;
+        this.winningPattern = null;
         this.init();
     }
 
@@ -24,6 +25,7 @@ class TicTacToe {
         if (!container) return;
         
         this.gameContainer = container;
+        this.resetState();
         
         container.innerHTML = `
             <div class="ttt-header">
@@ -41,6 +43,13 @@ class TicTacToe {
         `;
 
         this.attachEvents();
+    }
+
+    resetState() {
+        this.board = ['', '', '', '', '', '', '', '', ''];
+        this.gameActive = true;
+        this.isComputerThinking = false;
+        this.winningPattern = null;
     }
 
     attachEvents() {
@@ -202,10 +211,7 @@ class TicTacToe {
     }
 
     resetGame() {
-        this.board = ['', '', '', '', '', '', '', '', ''];
-        this.gameActive = true;
-        this.isComputerThinking = false;
-        this.winningPattern = null;
+        this.resetState();
         this.updateTurn('Your turn');
         
         const cells = this.gameContainer.querySelectorAll('.ttt-cell');
@@ -217,5 +223,5 @@ class TicTacToe {
 }
 
 // Initialize game when script loads
-new TicTacToe();
+window.ticTacToe = new TicTacToe();
 

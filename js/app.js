@@ -1,213 +1,199 @@
-/* ============================
-   MAIN APP CLASS
-   Handles modals, game player, CV viewer
-   ============================ */
+document.addEventListener('DOMContentLoaded', () => {
+    const mainContent = document.getElementById('main-content');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const hamburger = document.getElementById('hamburger');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const themeToggle = document.getElementById('themeToggle');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const body = document.body;
+    const themeStorageKey = 'saisa-theme';
+    const templates = window.PageTemplates || {};
 
-class App {
-    constructor() {
-        this.gameModal = document.getElementById('game-modal');
-        this.cvModal = document.getElementById('cv-modal');
-        this.gameIframe = document.getElementById('game-iframe');
-        this.gameModalTitle = document.getElementById('game-modal-title');
-        this.cvBtn = document.getElementById('cv-btn');
-        
-        this.init();
-    }
+    let currentPage = 'home';
 
-    init() {
-        // CV Button
-        this.cvBtn.addEventListener('click', () => this.openCVModal());
+    const renderPage = (page) => {
+        switch (page) {
+            case 'skills':
+                mainContent.innerHTML = templates.renderSkills(CONFIG);
+                break;
+            case 'projects':
+                mainContent.innerHTML = templates.renderProjects(CONFIG);
+                break;
+            case 'games':
+                mainContent.innerHTML = templates.renderGames(CONFIG);
+                mainContent.classList.remove('games-fade-in');
+                requestAnimationFrame(() => {
+                    mainContent.classList.add('games-fade-in');
+                });
+                setTimeout(() => {
+                    mainContent.classList.remove('games-fade-in');
+                }, 800);
+                break;
+            default:
+                mainContent.innerHTML = templates.renderHome(CONFIG);
+                if (window.ticTacToe && typeof window.ticTacToe.render === 'function') {
+                    window.ticTacToe.render();
+                }
+                if (typeof window.initArcadeHold === 'function') {
+                    window.initArcadeHold();
+                }
+        }
+    };
 
-        // Modal close buttons
-        document.getElementById('game-modal-close').addEventListener('click', () => this.closeGameModal());
-        const cvCloseBtn = document.getElementById('cv-close');
-        if (cvCloseBtn) {
-            cvCloseBtn.addEventListener('click', () => this.closeCVModal());
+    const closeSidebar = () => {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+        hamburger.classList.remove('active');
+    };
+
+    const navigate = (page) => {
+        currentPage = page;
+        document.querySelectorAll('.nav-item').forEach((item) => item.classList.remove('active'));
+        const activeItem = document.querySelector(`[data-page="${page}"]`);
+        if (activeItem) {
+            activeItem.classList.add('active');
         }
 
-        // CV Overlay click to close
-        const cvOverlay = document.querySelector('.fullscreen-overlay');
-        if (cvOverlay) {
-            cvOverlay.addEventListener('click', () => this.closeCVModal());
-        }
+        renderPage(page);
+        closeSidebar();
+        window.scrollTo(0, 0);
+    };
 
-        // Game overlay click
-        const gameOverlay = document.querySelector('.modal-overlay');
-        if (gameOverlay) {
-            gameOverlay.addEventListener('click', (e) => {
-                if (e.target === gameOverlay) {
-                    this.closeGameModal();
-                }
-            });
-        }
+    window.navigate = navigate;
 
-        // Game controls
-        document.getElementById('fullscreen-btn').addEventListener('click', () => this.toggleFullscreen());
-        document.getElementById('mute-btn').addEventListener('click', () => this.toggleMute());
+    sidebarToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        sidebar.classList.toggle('collapsed');
+    });
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (this.cvModal.classList.contains('active')) {
-                    this.closeCVModal();
-                } else if (this.gameModal.classList.contains('active')) {
-                    this.closeGameModal();
-                }
-            }
-            // F key for CV fullscreen
-            if (e.key === 'f' || e.key === 'F') {
-                if (this.cvModal.classList.contains('active')) {
-                    e.preventDefault();
-                    this.toggleCVFullscreen();
-                }
-            }
+    document.querySelectorAll('.nav-item').forEach((item) => {
+        item.addEventListener('click', (event) => {
+            event.preventDefault();
+            navigate(item.dataset.page);
         });
-    }
+    });
 
-    // ===== GAME MODAL =====
+    hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
 
-    openGame(gameId) {
-        const game = CONFIG.games.find(g => g.id === gameId);
+    sidebarOverlay.addEventListener('click', closeSidebar);
+
+    const gameModal = document.getElementById('game-modal');
+    const gameTitle = document.getElementById('game-title');
+    const gameIframe = document.getElementById('game-iframe');
+
+    const openGame = (gameId) => {
+        const game = CONFIG.games.find((item) => item.id === gameId);
         if (!game) return;
 
-        this.gameModalTitle.textContent = game.title;
-        document.getElementById('game-title-info').textContent = game.title;
-        this.gameIframe.src = game.embedUrl;
-        this.gameModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        
-        // Reset mute button
-        document.getElementById('mute-btn').textContent = '🔊 Mute';
-        this.isMuted = false;
-    }
+        gameTitle.textContent = game.title;
+        gameIframe.src = game.embedUrl;
+        gameModal.classList.add('active');
+        body.style.overflow = 'hidden';
+    };
 
-    closeGameModal() {
-        this.gameModal.classList.remove('active');
-        this.gameIframe.src = '';
-        document.body.style.overflow = '';
-    }
+    window.openGame = openGame;
 
-    toggleFullscreen() {
-        const iframe = this.gameIframe;
-        
-        if (!document.fullscreenElement) {
-            if (iframe.requestFullscreen) {
-                iframe.requestFullscreen();
-            } else if (iframe.webkitRequestFullscreen) {
-                iframe.webkitRequestFullscreen();
-            } else if (iframe.mozRequestFullScreen) {
-                iframe.mozRequestFullScreen();
-            } else if (iframe.msRequestFullscreen) {
-                iframe.msRequestFullscreen();
-            }
+    document.getElementById('game-close').addEventListener('click', () => {
+        gameModal.classList.remove('active');
+        gameIframe.src = '';
+        body.style.overflow = '';
+    });
+
+    gameModal.addEventListener('click', (event) => {
+        if (event.target === gameModal) {
+            gameModal.classList.remove('active');
+            gameIframe.src = '';
+            body.style.overflow = '';
+        }
+    });
+
+    document.getElementById('fullscreen-btn').addEventListener('click', () => {
+        const iframe = document.getElementById('game-iframe');
+        if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+        } else if (iframe.webkitRequestFullscreen) {
+            iframe.webkitRequestFullscreen();
+        } else if (iframe.mozRequestFullScreen) {
+            iframe.mozRequestFullScreen();
+        }
+    });
+
+    document.getElementById('mute-btn').addEventListener('click', function () {
+        const muteText = this.querySelector('.mute-text');
+        const volumeIcon = this.querySelector('.volume-icon');
+
+        if (muteText.textContent === 'Mute') {
+            muteText.textContent = 'Unmute';
+            volumeIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
+            muteText.textContent = 'Mute';
+            volumeIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
         }
-    }
+    });
 
-    toggleMute() {
-        this.isMuted = !this.isMuted;
-        const muteBtn = document.getElementById('mute-btn');
-        
-        if (this.isMuted) {
-            muteBtn.textContent = '🔇 Unmute';
-            // Note: Direct muting is limited due to iframe sandbox restrictions
-            // Some games may support mute parameter
+    document.getElementById('reload-btn').addEventListener('click', () => {
+        gameIframe.src = gameIframe.src;
+    });
+
+    const moonIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    const sunIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+
+    const applyTheme = (theme) => {
+        if (theme === 'light') {
+            body.classList.add('light');
+            toggleIcon.innerHTML = sunIcon;
         } else {
-            muteBtn.textContent = '🔊 Mute';
+            body.classList.remove('light');
+            toggleIcon.innerHTML = moonIcon;
         }
-    }
 
-    // ===== CV MODAL =====
+        localStorage.setItem(themeStorageKey, theme);
+    };
 
-    openCVModal() {
-        this.cvModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
+    themeToggle.addEventListener('click', () => {
+        const isLight = body.classList.contains('light');
+        applyTheme(isLight ? 'dark' : 'light');
+    });
 
-    closeCVModal() {
-        this.cvModal.classList.remove('active');
-        document.body.style.overflow = '';
-        // Exit fullscreen if active
-        if (document.fullscreenElement === this.cvImage) {
-            document.exitFullscreen().catch(() => {});
+    const savedTheme = localStorage.getItem(themeStorageKey);
+    applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+
+    const cvBtn = document.getElementById('cv-btn');
+    const cvModal = document.getElementById('cv-modal');
+    const cvCloseBtn = document.getElementById('cv-close-btn');
+    const cvIframe = document.getElementById('cv-iframe');
+    const cvOverlay = document.querySelector('.cv-modal-overlay');
+
+    cvBtn.addEventListener('click', () => {
+        cvModal.classList.add('active');
+        cvIframe.src = 'sources/Sandesh_CV.pdf';
+        body.style.overflow = 'hidden';
+    });
+
+    const closeCVModal = () => {
+        cvModal.classList.remove('active');
+        setTimeout(() => {
+            cvIframe.src = '';
+        }, 300);
+        body.style.overflow = '';
+    };
+
+    cvCloseBtn.addEventListener('click', closeCVModal);
+    cvOverlay.addEventListener('click', closeCVModal);
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeCVModal();
+            gameModal.classList.remove('active');
+            gameIframe.src = '';
+            body.style.overflow = '';
         }
-    }
+    });
 
-    /**
-     * Toggle fullscreen mode for CV image
-     */
-    toggleCVFullscreen() {
-        if (!this.cvImage) return;
-
-        if (!document.fullscreenElement) {
-            // Enter fullscreen
-            if (this.cvImage.requestFullscreen) {
-                this.cvImage.requestFullscreen().catch(err => console.error('[CV] Fullscreen error:', err));
-            } else if (this.cvImage.webkitRequestFullscreen) {
-                this.cvImage.webkitRequestFullscreen();
-            } else if (this.cvImage.mozRequestFullScreen) {
-                this.cvImage.mozRequestFullScreen();
-            } else if (this.cvImage.msRequestFullscreen) {
-                this.cvImage.msRequestFullscreen();
-            }
-        } else {
-            // Exit fullscreen
-            if (document.exitFullscreen) {
-                document.exitFullscreen().catch(() => {});
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-    }
-
-    /**
-     * Zoom in CV PDF
-     */
-    zoomInCV() {
-        if (!this.cvImage) return;
-        if (this.cvIsZoomed) return; // Already zoomed
-
-        this.cvIsZoomed = true;
-        this.cvImage.classList.add('zoomed');
-        
-        const wrapper = this.cvImage.parentElement;
-        if (wrapper) {
-            wrapper.classList.add('zoomed');
-            wrapper.style.overflow = 'auto';
-        }
-        
-        this.updateCVZoomButtons();
-    }
-
-    /**
-     * Zoom out CV PDF (fit to screen)
-     */
-    zoomOutCV() {
-        if (!this.cvImage) return;
-    }
-
-    // ===== UTILITIES =====
-
-    log(message) {
-        console.log(`[Portfolio App] ${message}`);
-    }
-}
-
-// Initialize app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new App();
-    this.log = (msg) => console.log(`[Portfolio] ${msg}`);
+    navigate(currentPage);
 });

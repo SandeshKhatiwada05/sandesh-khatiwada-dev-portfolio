@@ -1,8 +1,0 @@
-<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
-  <!-- Magnifying glass circle -->
-  <circle cx="40" cy="40" r="30" fill="none" stroke="#715A5A" stroke-width="4"/>
-  <!-- Magnifying glass handle -->
-  <line x1="60" y1="60" x2="80" y2="80" stroke="#715A5A" stroke-width="4" stroke-linecap="round"/>
-  <!-- Minus sign -->
-  <line x1="28" y1="40" x2="52" y2="40" stroke="#715A5A" stroke-width="3" stroke-linecap="round"/>
-</svg>
